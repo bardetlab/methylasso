@@ -1,0 +1,19 @@
+Package: MethyLasso
+Type: Package
+Title: MethyLasso: a segmentation approach to analyze DNA methylation patterns and identify differentially methylation regions from whole-genome datasets
+Version: 1.0
+Date: 2023-07-20
+Authors: Delphine Balaramane, Yannick Spill and Anais Flore Bardet
+Maintainer: Anais Flore Bardet <bardeta@igbmc.fr>
+Description: MethyLasso identifies low-methylated regions (LMRs), unmethylated regions (UMRs), DNA methylation valleys (DMVs) and partially methylated domains (PMDs) in a single condition as well as differentially methylated regions (DMRs) between two conditions
+License: MIT
+Imports: Rcpp (>= 1.0.0), RcppEigen (>= 0.3.3.5.0)
+LinkingTo: Rcpp, RcppEigen, BH, RcppGSL
+RoxygenNote: 6.1.1
+Encoding: UTF-8
+Collate: 
+    'MethyLasso.R'
+    'call.R'
+    'fast_diff.R'
+    'genome_wide.R'
+    'zzz.R'
