@@ -1,0 +1,286 @@
+namespace MethyLasso {
+/*! \file mainpage.dox 
+ * \mainpage GAM and Lasso calculations package for genomics data
+ *
+ * <b>The classes presented here allow to perform IRLS estimation using generalized
+ * additive models and lasso regression, on large-scale datasets such as those
+ * obtained in high-throughput sequencing.</b>
+ *
+ * \section context Statistical context and main classes
+ * 
+ * The Posterior class provides estimates of posterior distributions in the
+ * following form
+ *
+ * \f[
+ *  p(\beta|D) \propto L_g(D | \beta) \prod_l P_l(\beta_{l\cdot})
+ * \f]
+ * 
+ * where the data \f$D\f$ has likelihood \f$L_g\f$ with parameters and
+ * hyperparameters \f$\beta\f$. The likelihood must be the same for the whole data
+ * vector (only one type of data per estimation). The prior decomposes in a subset
+ * of priors \f$P_l\f$ each of which acts on a subset of all parameters, written as
+ * \f$\beta_{l\cdot}\f$. The data and the parameters are linked together through
+ * a link function \f$g\f$, a number of design matrices \f$X_l\f$ and binner
+ * matrices \f$B_l\f$
+ * 
+ * \f[
+ *  E(D) \equiv \mu \equiv g^{-1}\left(\sum_l B_l^\top \phi_i\right) \qquad \phi_l \equiv
+ *  X_l\beta_{l\cdot}
+ *  \f]
+ *
+ * The IRLS allows to obtain fast and exact solutions to the maximum posterior.
+ * It proceeds by iterative gaussian approximations of \f$L_g\f$ around
+ * \f$\phi\f$. This approximation is only possible for members of
+ * the exponential family, although some extensions (negative binomial,
+ * beta-binomial) are possible. The Posterior class implements the
+ * initialization of parameters and subsequent IRLS iterations and update of
+ * hyperparameters until convergence. Because each prior on \f$\beta_{l\cdot}\f$
+ * can be different, estimation of \f$\beta_{l\cdot}\f$ will be done in turn,
+ * within each iteration.  Each such part is called a Leg. Each Leg is taken care
+ * of by a Estimator class.
+ *
+ * \section irls Background on IRLS and associated classes
+ * 
+ * A Posterior is initialized by specifying a Distribution and a Link function.
+ * These two classes are responsible for converting the raw data to and from 
+ * the IRLS pseudodata. Define
+ * \f[
+ *  \ell(d_i,\mu_i) \equiv  - \log L_g(d_i | \eta_i \equiv g(\mu_i))
+ * \f]
+ * 
+ * At any given step \f$k\f$, we have our current estimate of the mean \f$\mu_i^k\f$ of the
+ * distribution. A quadratic approximation of \f$\ell(\mu_i)\f$ around \f$\mu_i^k\f$
+ * is
+ * \f[
+ *  \ell(d,\mu_i^k) \simeq \frac{(d_i-\mu_i^k)^2}{2V_i^k}
+ * \f]
+ *
+ * with \f$V_i^k\f$ the variance of the distribution with mean \f$\mu_i^k\f$. 
+ * If something else than the mean is to be modelled (e.g. for a binomial, the
+ * rate) the discussion is similar. We still write \f$\mu_i^k\f$ for this new
+ * quantity, and adjust \f$V_i^k\f$ to match the new definition. The Distribution class
+ * contains this information and can compute it using parameter iteration
+ * \f$\mu_i^k\f$. Note that it does not depend on the link function. We now seek
+ * to update \f$\mu_i^k\f$ to a better value. For that purpose, we express the
+ * previous approximation as a function of \f$\eta_i \equiv g(\mu_i) \equiv
+ * \eta_i^k + \epsilon\f$. This expansion leads to the standard form of the IRLS
+ * approximation used throughout
+ * \f[
+ *  \ell(z_i^k,\eta_i) \simeq
+ *  \frac{W_i^k}{2}\left(z_i^k + \eta_i^k - \eta_i\right)^2
+ *  \quad z_i^k \equiv g'(\mu_i^k)(d-\mu_i^k)
+ *  \qquad W_i^k \equiv \frac{1}{V_i^kg'^2(\mu_i^k)}
+ * \f]
+ *
+ * The Link function takes care of this second part of the approximation, since it
+ * only depends on \f$g\f$ and \f$g'\f$ and not on the type of distribution. We
+ * call \f$z_i^k\f$ residual and \f$W_i^k\f$ weight of \f$d_i\f$ at step
+ * \f$k\f$. Their pair form a predictor::IRLSResiduals class.
+ *
+ * \section estimator Estimator
+ *
+ * The role of an estimator::Estimator is to update the parameters relative to a
+ * given optimization leg, \f$\beta_{l\cdot}\f$. The IRLS target for these
+ * parameters can be
+ * written as
+ * \f[
+ *    S_k = \frac{1}{2} (z^k + \eta^k_l - \eta_l)^\top W^k
+ * (z^k + \eta^k_l - \eta_l)   \qquad \eta_l = B_l^\top X_l \beta_{l\cdot}
+ * \f]
+ *
+ * Vector \f$\eta_l\f$ is stored in predictor::LinearResponse, and \f$z_l^k\f$
+ * and \f$W^k\f$ are stored in predictor::IRLSResiduals.  \f$\beta_{l\cdot}\f$ is
+ * optimized through several data reduction steps as we now show.
+ *
+ * \subsection binner Binner
+ *
+ * To reduce the computational burden as much as possible, the input data is
+ * averaged into bins, which can but must not be specific for each leg. The
+ * binned::Binner class is built around a binner matrix \f$B_l\f$. \f$B_{lij}\f$
+ * equals to 1 if \f$d_j\f$ falls in bin \f$i\f$, and zero otherwise. Typically,
+ * bin size is chosen small enough so that the linear response variable
+ * \f$\eta_{li}\f$ of this leg is not expected to change in that bin, and can
+ * therefore be given value \f$\phi_{li}\f$. For example, for cubic splines, the
+ * binsize can be chosen as one tenth of the support of a spline, because no
+ * combination of \f$\beta_{l\cdot}\f$ can be found that generates very
+ * different values on this bin. Thus, by construction
+ *
+ * \f[
+ *   \eta_l = B_l^\top \phi_l \qquad \phi_l = (\hat{W}_l^k)^{-1} B_l W^k \eta_l
+ * \qquad \hat{W}_l^k \equiv B_l W^k B_l^\top
+ * \f]
+ *
+ * Note that \f$\hat{W}_l^k\f$ is invertible if empty bins are left out. If they are
+ * not left out, we use the pseudoinverse, which amounts to setting
+ * \f$\phi_l^k\f$ and \f$\hat{W}_l^k\f$ to zero for that bin. Writing
+ * \f$\eta_l^k = B_l^\top\phi_l^k\f$, the IRLS target can be rewritten up to a
+ * constant independent of \f$\phi_l\f$ as
+ *
+ * \f[
+ * S_k = \frac{1}{2}\left(\hat{z}_l^k+\phi^k_l-\phi_l\right)^\top
+ *        \hat{W}_l^k \left(\hat{z}_l^k+\phi^k_l-\phi_l\right)
+ * \qquad \hat{z}_l^k \equiv ({\hat{W}_l}^{k})^{-1} B_lW^kz^k
+ * \f]
+ *
+ * The binned::Binner is used to compute the binned::BinnedResiduals
+ * \f$\hat{z}^k_l\f$ and \f$\hat{W}_l\f$ from the predictor::IRLSResiduals
+ * \f$z^k\f$ and \f$W^k\f$. It also allows to compute a
+ * predictor::LinearResponse \f$\eta_l\f$ from a binned::Estimate \f$\phi_l\f$.
+ *
+ * \subsection design Design
+ *
+ * The binned::BinnedResiduals is simply a compressed representation of the data.
+ * However, \f$\beta_{l\cdot}\f$ might model a combination of of datasets,
+ * for example a difference. The params::Design class is used for that purpose.
+ * It represents the design
+ * matrix \f$X_l\f$, and allows to compute pseudodata \f$\hat{\beta}_l^k\f$ and
+ * pseudoweights \f$\tilde{W}_l^k\f$ (held in class params::Pseudodata) from a
+ * binned::BinnedResiduals. The resulting IRLS target can therefore be written up to a
+ * constant as
+ * \f[
+ * S_k = \frac{1}{2}\left(\hat{\beta}^k_l-\beta_{l\cdot}\right)^\top
+ *        \tilde{W}_l^k \left(\hat{\beta}^k_l-\beta_{l\cdot}\right)
+ * \qquad \tilde{W}_l^k \equiv X_l^\top \hat{W}_l^k X_l
+ * \qquad \hat{\beta}_l^k \equiv ({\tilde{W}_l}^{k})^{-1} X_l^\top \hat{W}_l^k
+ * \hat{z}_l^k + \beta^k_l
+ * \f]
+ *
+ *
+ * If \f$\tilde{W}_l^k\f$ is not invertible, we use the pseudoinverse as
+ * previously. Each estimator::Estimator holds a binned::Binner, a
+ * binned::BinnedResiduals, a params::Pseudodata, an estimator::Fitter, params::Params,
+ * params::Hyperparams and binned::Estimate. The Fitter uses these pseudodata
+ * and computes new estimates of \f$ \beta_{l\cdot} \f$ (class params::Params)
+ * according taking into account the prior \f$ P_i(\beta_{i\cdot})\f$ (and
+ * corresponding hyperparameters in params::Hyperparams).
+ *
+ * It is sometimes convenient to obtain a centered value for
+ * \f$\beta_{l\cdot}\f$. In that case, \f$1^\top \tilde{W}_l^k
+ * \beta_l / (1^\top \tilde{W}_l^k 1)\f$ (i.e. the weighted average of
+ * \f$\beta_l\f$) is subtracted from \f$\beta_l\f$ after performing the fit
+ * using \f$X_l\f$. This procedure avoids turning \f$X_l\f$ into a dense matrix by
+ * centering it.
+ *
+ * \section class_graph Relationship between main classes in a Posterior optimization
+ *  \dot
+ *  digraph maximum_posterior {
+ *      rankdir=LR;
+ *      nodesep=.05;
+ *      graph [fontname=Helvetica, fontsize=8];
+ *      node [fontname=Helvetica, fontsize=8, shape=record];
+ *      edge [fontname=Helvetica, fontsize=8, arrowhead="open", style="solid"];
+ *
+ *      subgraph cluster_0 {
+ *         style=filled;
+ *         color=gray80;
+ *         label="data";
+ *         URL="\ref MethyLasso::data";
+ *
+ *         Observations [ label="Observations" URL="\ref data::Observations"];
+ *      }
+ *
+ *      subgraph cluster_1 {
+ *         style=filled;
+ *         color=lightblue;
+ *         label="predictor";
+ *         URL="\ref predictor";
+ *
+ *         LinearResponse [label="LinearResponse", URL="\ref predictor::LinearResponse"];
+ *         MeanVector [label="MeanVector", URL="\ref predictor::MeanVector"];
+ *      }
+ *         
+ *      subgraph cluster_1b {
+ *         style=filled;
+ *         color=lightblue;
+ *         label="predictor";
+ *         URL="\ref predictor";
+ *
+ *         Moments [label="Moments", URL="\ref predictor::Moments"];
+ *         IRLSResiduals [ label="IRLSResiduals" URL="\ref predictor::IRLSResiduals"];
+ *      }
+ *         
+ *      subgraph cluster_2 {
+ *         style=filled;
+ *         color=lightseagreen;
+ *         label="binned";
+ *         URL="\ref binned";
+ *
+ *         BinnedResiduals [label="BinnedResiduals", URL="\ref binned::BinnedResiduals"];
+ *      }
+ *
+ *      subgraph cluster_2b {
+ *         style=filled;
+ *         color=lightseagreen;
+ *         label="binned";
+ *         URL="\ref binned";
+ *
+ *         Estimate [label="Estimate", URL="\ref binned::Estimate"];
+ *      }
+ *
+ *      subgraph cluster_3 {
+ *         style=filled;
+ *         color=lightcoral;
+ *         label="params";
+ *         URL="\ref params";
+ *      
+ *         Params [label="Params", URL="\ref params::Params"];
+ *         Hyperparams [label="Hyperparams", URL="\ref params::Hyperparams"];
+ *         Pseudodata [label="Pseudodata", URL="\ref params::Pseudodata"];
+ *      }
+ *
+ *      IRLSResiduals -> BinnedResiduals [label="Binner", URL="\ref binned::Binner"];
+ *      BinnedResiduals -> Pseudodata [label="Design", URL="\ref params::Design"];
+ *      Pseudodata -> Params [label="Fitter", URL="\ref estimator::Fitter"];
+ *      Params -> Pseudodata;
+ *      Hyperparams -> Params [label="Fitter", URL="\ref estimator::Fitter"];
+ *      Params -> Estimate [label="Design", URL="\ref params::Design"];
+ *      Estimate -> LinearResponse [label="Binner", URL="\ref binned::Binner"];
+ *      LinearResponse -> MeanVector [label="Link", URL="\ref link"]
+ *      MeanVector -> Moments [label="distribution", URL="\ref Distribution.hpp"];
+ *      Observations -> Moments [label="distribution", URL="\ref Distribution.hpp"];
+ *      Moments -> IRLSResiduals [ label="Link", URL="\ref link" ];
+ *      
+ *
+ *  }
+ *  \enddot 
+ * 
+ *
+ */ 
+
+/*! @brief Objects that handle data and parameters of same size than the input
+ * data
+ */
+namespace predictor {}
+
+/*! @brief Objects that handle binning of individual datasets
+*/
+namespace binned {}
+
+/*! @brief Objects that handle fitting at a single binned and combined
+ * dataset level
+ */
+namespace params {}
+
+/*! @brief Link functions
+ */
+namespace link {}
+
+/*! @brief Distributions
+ */
+namespace distribution {}
+
+/*! @brief Objects to store input data
+ */
+namespace data {}
+
+/*! @brief where Estimator lives
+ */
+namespace estimator {}
+
+}
+}
+
+
+
+
+
