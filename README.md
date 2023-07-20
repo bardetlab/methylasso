@@ -46,7 +46,7 @@ Rscript MethyLasso.R --n1 [name1] --c1 [condition1_replicate1,condition1_replica
 ## 4. &emsp;Input format
 
 By Default, Methylasso takes a tab-delimited file containing for each CpG:  
-chr / start / end / count of methylated Cs / count of unmethylated Cs  
+chr / start / end / percent_methylation / count_methylated / count_unmethylated 
 This file can be generated within the Bismark pipeline with the command Coverage2Cytosine with option --mergeCpG.  
 
 Alternatively, files with different formats can be provided by specifying the columns. For each CpG, their genomic coordinates should be in the first three columns (chr / start / end) and columns containing the counts of methylated and unmethylated Cs OR total count and methylation percentage should be specified.  
