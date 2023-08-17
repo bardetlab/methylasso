@@ -4,7 +4,9 @@ A segmentation approach to analyze DNA methylation patterns and identify differe
 MethyLasso models DNA methylation data using a nonparametric regression framework known as a Generalized Additive Model. It relies on the fused lasso method to segment the genome by estimating regions in which methylation is constant to study DNA methylation patterns in a single condition or capture dynamic changes of DNA methylation levels across conditions.  
 MethyLasso identifies low-methylated regions (LMRs), unmethylated regions (UMRs), DNA methylation valleys (DMVs) and partially methylated domains (PMDs) in a single condition as well as differentially methylated regions (DMRs) between two conditions.
 
-By Delphine Balaramane, Yannick G Spill, Michaël Weber & Anaïs F Bardet.
+By Delphine Balaramane, Yannick G Spill, Michaël Weber & Anaïs F Bardet.  
+
+Publication: https://www.biorxiv.org/content/10.1101/2023.07.27.550791v1
 
 ## 1. &emsp;Installation
 Dependencies:
