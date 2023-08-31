@@ -27,9 +27,8 @@ help <- function(){
     cat("\nARGUMENTS:\n")
     cat(" --n1\tName of condition 1 (used in output file names)\n")
     cat(" --c1\tInput file(s) for condition 1 (separated by comma for replicates)\n")
-    cat(" --n2\tName of condition 2 (used in output file names)\n")
+    cat(" --n2\tName of condition 2 (used in output file names and corresponding to reference condition for DMR identification) \n")
     cat(" --c2\tInput file(s) for condition 2 (separated by comma for replicates)\n")
-    cat(" --ref\tName of reference condition for DMR identification (should be n1 or n2) (if no ref is specified DMR calling is not performed)\n")
     cat("\nINPUT FORMAT:\n")
     cat("Default: Bismark output file (.gz) with for each CpG: chr / start / end / count of methylated Cs / count of unmethylated Cs\n")
     cat("Alternative: Tab delimited file with for each CpG: chr / start / end, and specify which column contains: count of methylated and unmethylated Cs OR coverage and methylation percentage.\n")
@@ -250,7 +249,7 @@ mindepth = if (!is.null(c)) {
 data = data[coverage >= mindepth]
 
 
- if (isFALSE(s) && exists("c1") && exists("c2") && exists("ref") && ref == n1 || isFALSE(s) && exists("c1") && exists("c2") && exists("ref") && ref == n2) {
+ if (isFALSE(s) && exists("c1") && exists("c2")) {
   ### Part 1 and Part2
   # FIT
   if (isFALSE(quiet)) {
@@ -286,16 +285,12 @@ data = data[coverage >= mindepth]
       quote = FALSE, row.names = FALSE, sep = "\t"
     )
   }
-		# Create name n which is not the reference name
-  if (n1 != ref) {
-    nam = n1
-  } else {
-    nam = n2
-  }
+	 
+ref = n2
 
   if (isFALSE(quiet)) {
     message("Part 2: Beginning identification of differentially methylated regions (DMRs) across two conditions \n")
-    message("Comparison ", nam, " to ", ref, " (ref)")
+    message("Comparison ", n1, " to ", n2, " (ref)")
   } else {
     stop("You need to specify a second condition, name, and reference to find DMRs.")
   }
@@ -317,36 +312,32 @@ data = data[coverage >= mindepth]
   differences = MethyLasso:::annotate_differences(diff_call, segments)
 
   write.table(
-    differences[, .(chr = chr, start = start, end = end, num.cpgs1 = num.cpgs.ref, num.cpgs2 = num.cpgs, cov.score = coverage.score, meth1 = beta.ref, meth2 = beta, diff = diff, pvalue = pval, FDR = fdr, annotation = switch)],
-    file = paste(o, "/", nam, "_vs_", ref, "_dmrs.tsv", sep = ""),
+    differences[, .(chr = chr, start = start, end = end, num.cpgs1 = num.cpgs, num.cpgs2 = num.cpgs.ref, cov.score = coverage.score, meth1 = beta, meth2 = beta.ref, diff = diff, pvalue = pval, FDR = fdr, annotation = switch)],
+    file = paste(o, "/", n1, "_vs_", n2, "_dmrs.tsv", sep = ""),
     quote = FALSE, row.names = FALSE, sep = "\t"
   )
 
   # Create DMR plot
   if (isTRUE(f)) {
     # DMR scatterplot
-    pdf(paste0(o, "/", nam, "_vs_", ref, "_dmrs_plot.pdf", sep = ""))
+    pdf(paste0(o, "/", n1, "_vs_", n2, "_dmrs_plot.pdf", sep = ""))
     par(mfrow = c(1, 1), bg = "white")
     smoothScatter(
       diff_call$beta * 100, diff_call$beta.ref * 100,
-      xlab = paste0(nam, " DNA methylation (%)"),
-      ylab = paste0(ref, " DNA methylation (%)"),
-      main = paste0("DNA methylation ", nam, " vs ", ref)
+      xlab = paste0(n1, " DNA methylation (%)"),
+      ylab = paste0(n2, " DNA methylation (%)"),
+      main = paste0("DNA methylation ", n1, " vs ", n2)
     )
     null = dev.off()
   }
-} else if (isTRUE(s) && exists("c1") && exists("c2") && exists("ref") && ref == n1 || isTRUE(s) && exists("c1") && exists("c2") && exists("ref") && ref == n2) {
+} else if (isTRUE(s) && exists("c1") && exists("c2")) {
   ### Only Part2
   # Create name n which is not the reference name
-  if (n1 != ref) {
-    nam = n1
-  } else {
-    nam = n2
-  }
+  ref = n2
 
   if (isFALSE(quiet)) {
     message("\nPart 2: Beginning identification of differentially methylated regions (DMRs) across two conditions \n")
-    message("Comparison ", nam, " to ", ref, " (ref)")
+    message("Comparison ", n1, " to ", n2, " (ref)")
   } else {
     stop("You need to specify a second condition, name, and reference to find DMRs.")
   }
@@ -366,25 +357,25 @@ data = data[coverage >= mindepth]
   diff_call = MethyLasso:::call_differences(data, ret, min.diff = d, pval.cutoff = p, fdr.cutoff = q, min.num.cpgs = n, cov.score = r * 100, ncores = t, verbose = !quiet)
 
   write.table(
-    diff_call[, .(chr = chr, start = start, end = end, num.cpgs1 = num.cpgs.ref, num.cpgs2 = num.cpgs, cov.score = coverage.score, meth1 = beta.ref, meth2 = beta, diff = diff, pvalue = pval, FDR = fdr)],
-    file = paste(o, "/", nam, "_vs_", ref, "_dmrs.tsv", sep = ""),
+    diff_call[, .(chr = chr, start = start, end = end, num.cpgs1 = num.cpgs, num.cpgs2 = num.cpgs.ref, cov.score = coverage.score, meth1 = beta, meth2 = beta.ref, diff = diff, pvalue = pval, FDR = fdr)],
+    file = paste(o, "/", n1, "_vs_", n2, "_dmrs.tsv", sep = ""),
     quote = FALSE, row.names = FALSE, sep = "\t"
   )
   # Create DMR plot
   if (isTRUE(f)) {
     # DMR scatterplot
-    pdf(paste0(o, "/", nam, "_vs_", ref, "_dmrs_plot.pdf", sep = ""))
+    pdf(paste0(o, "/", n1, "_vs_", n2, "_dmrs_plot.pdf", sep = ""))
     par(mfrow = c(1, 1), bg = "white")
     smoothScatter(
       diff_call$beta * 100, diff_call$beta.ref * 100,
-      xlab = paste0(nam, " DNA methylation (%)"),
-      ylab = paste0(ref, " DNA methylation (%)"),
-      main = paste0("DNA methylation ", nam, " vs ", ref)
+      xlab = paste0(n1, " DNA methylation (%)"),
+      ylab = paste0(n2, " DNA methylation (%)"),
+      main = paste0("DNA methylation ", n1, " vs ", n2)
     )
     null = dev.off()
   }
 
-} else if (!exists("ref") && exists("c1") || !exists("ref") && exists("c2")) {
+} else if ( exists("c1") && !exists("c2")|| exists("c2")  && !exists("c1")) {
   ### Only Part1
   if (isFALSE(quiet)) {
     message("\nPart 1: Beginning analysis of the levels of DNA methylation in a single condition\n")
