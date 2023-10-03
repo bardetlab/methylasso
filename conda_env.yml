@@ -1,0 +1,20 @@
+name: MethyLasso
+channels:
+  - conda-forge
+  - r
+  - bioconda
+dependencies:
+  - r-base
+  - r-essentials
+  - r-rcppeigen
+  - r-rcppgsl
+  - r-bh
+  - r-doparallel
+  - r-ggrepel
+  - r-data.table
+  - r-foreach
+  - r-ggplot2
+  - r-scales
+  - r-matrix
+  - r-matrixstats
+  
