@@ -28,7 +28,7 @@ R CMD INSTALL --preclean methylasso-main
   
 ## 2. &emsp;Usage
 Using data from two different conditions:  
-Rscript MethyLasso.R --n1 [name1] --c1 [condition1_replicate1,condition1_replicate2,..] --n2 [name2] --c2 [condition2_replicate1,condition2_replicate2,..] --ref [reference] [options]
+Rscript MethyLasso.R --n1 [name1] --c1 [condition1_replicate1,condition1_replicate2,..] --n2 [name2] --c2 [condition2_replicate1,condition2_replicate2,..] [options]
 
 Using data from only one condition (not calling DMRs):  
 Rscript MethyLasso.R --n1 [name1] --c1 [condition1_replicate1,condition1_replicate2,..] [options]
