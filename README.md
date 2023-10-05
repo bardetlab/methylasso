@@ -15,15 +15,15 @@ Dependencies:
 - Requires anaconda (if you use conda installation)
 
 mkdir MethyLasso  
-tar -zxvf MethyLasso.tar.gz  
-R CMD INSTALL --preclean MethyLasso  
+unzip methylasso-main.gz  
+R CMD INSTALL --preclean methylasso-main
 
 Conda installation:  
 
-tar -zxvf MethyLasso.tar.gz  
-conda env create -f MethyLasso/conda_env.yml  
+unzip methylasso-main.gz  
+conda env create -f methylasso-main/conda_env.yml  
 conda activate MethyLasso  
-R CMD INSTALL --preclean MethyLasso  
+R CMD INSTALL --preclean methylasso-main
   
   
 ## 2. &emsp;Usage
