@@ -66,6 +66,7 @@ OR
 | ---------- | --- |
 |-c | Minimum coverage per CpG (default 5)|
 |-n | Minimum number of CpGs in LMRs, UMRS, DMVs and DMRs (default 4)|
+|-m | Maximum mean methylation for PMDs (default 0.7)|
 |-d | Minimum methylation difference for DMRs [0-1] (default 0.1)|
 |-p | P-value threshold for DMRs (default 0.05)|
 |-q | Q-value (FDR) threshold for DMRs (to be used instead of p-value threshold)|
@@ -85,6 +86,8 @@ Two histograms are generated for each replicate in each condition in a pdf file 
 
 For the LMR/UMR/DMV/PMD part, two tab-delimited files will be generated for each condition name_lmr_umr_dmv.tsv and name_pmd.tsv containing:
 chr / start / end / number of CpGs / methylation / standard deviation / category
+
+After PMDs identification, a smooth scatter plot containing the standart deviation and mean methylation of each PMDs is generated in a pdf file for each condition name1_pmds_plot.pdf and name2_pmds_plot.pdf.
 
 For the DMR part, one tab-delimited file will be generated name1_vs_name2_dmrs.tsv containing:
 chr / start / end / number of CpGs condition 1 / number of CpGs condition 2 / replicate coverage score / mean methylation 1 / mean methylation 2 / methylation difference / p-value / q-value / annotation
