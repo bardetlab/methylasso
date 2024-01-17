@@ -22,7 +22,7 @@ args=commandArgs(TRUE)
 ## Help
 help <- function(){
     cat("MethyLasso identifies low-methylated regions (LMRs), unmethylated regions (UMRs), DNA methylation valleys (DMVs) and partially methylated domains (PMDs) in a single condition as well as differentially methylated regions (DMRs) between two conditions\n")
-    cat("\nUSAGE for two conditions:\nRscript methyLasso.R --n1 [name1] --c1 [cond1_rep1,cond1_rep2,..] --n2 [name2] --c2 [cond2_rep1,cond2_rep2,..] -r [ref] [options]\n")
+    cat("\nUSAGE for two conditions:\nRscript methyLasso.R --n1 [name1] --c1 [cond1_rep1,cond1_rep2,..] --n2 [name2] --c2 [cond2_rep1,cond2_rep2,..] [options]\n")
     cat("\nUSAGE for one condition:\nRscript methyLasso.R --n1 [name1] --c1 [cond1_rep1,cond1_rep2,..] [options]\n")
     cat("\nARGUMENTS:\n")
     cat(" --n1\tName of condition 1 (used in output file names)\n")
@@ -40,6 +40,7 @@ help <- function(){
     cat("\nOPTIONS:\n")
     cat(" -c\tMinimum coverage per CpG (default 5)\n")
     cat(" -n\tMinimum number of CpGs in LMRs, UMRS, DMVs and DMRs (default 4)\n")
+    cat(" -m\tMaximum mean methylation for PMDs (default 0.7)\n")
     cat(" -d\tMinimum methylation difference for DMRs [0-1] (default 0.1)\n")
     cat(" -p\tP-value threshold for DMRs (default 0.05)\n")
     cat(" -q\tQ-value (FDR) threshold for DMRs (to be used instead of p-value threshold)\n")
@@ -60,6 +61,7 @@ help <- function(){
 ## Default arguments
 c = 5
 n = 4
+m = 0.7
 d = 0.1
 p = 0.05
 q = 1
@@ -264,8 +266,8 @@ data = data[coverage >= mindepth]
     message("\nStep 2: Segmentation and identification of PMDs, LMRs, UMRs and DMVs\n")
   }
 
-  segments <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = 0.70, min_num_cpgs = n)
-
+  segments <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = m, min_num_cpgs = n)
+  seg <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = 1, pmd_std_threshold=0, min_num_cpgs = n)
   # Save file
   for (i in seq_along(data_list)) {
     name <- nam[i]
@@ -277,6 +279,17 @@ data = data[coverage >= mindepth]
       quote = FALSE, row.names = FALSE, sep = "\t"
     )
 
+    seg1 <- seg$pmd[condition == name]
+    print(seg1)
+    # Set the file name for the PDF
+    if (isTRUE(f)) {
+    	pdf(paste0(o,"/", name, "_pmds_plots.pdf"))
+    	par(mfrow = c(1, 1), bg = "white")
+    smoothScatter(seg1$beta,seg1$std, ylim=c(0,0.5), xlim=c(0,1), ylab="Standard deviation", xlab="mean DNA methylation", main=paste("MethyLasso segments \n", name))
+    abline(v = 0.7, col = rgb(1, 0, 0, alpha = 0.5)) 
+    null = dev.off()
+    }
+	  
     # LMR, UMR and DMV
     lmr_umr_dmv <- segments$lmr_umr_valley[condition == name]
     write.table(
@@ -389,8 +402,9 @@ ref = n2
     message("\nStep 2: Segmentation and identification of PMDs, LMRs, UMRs and DMVs\n")
   }
 
-segments <- MethyLasso:::segment_methylation(data, ret, ncores = t, min_num_cpgs = n, pmd_max_beta = 0.70)
-
+segments <- MethyLasso:::segment_methylation(data, ret, ncores = t, min_num_cpgs = n, pmd_max_beta = m)
+seg <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = 1, pmd_std_threshold=0, min_num_cpgs = n)
+	 
   # Save file
   for (i in seq_along(data_list)) {
     name <- nam[i]
@@ -401,7 +415,18 @@ segments <- MethyLasso:::segment_methylation(data, ret, ncores = t, min_num_cpgs
       file = paste(o, "/", name, "_pmd.tsv", sep = ""),
       quote = FALSE, row.names = FALSE, sep = "\t"
     )
-
+	  
+    seg1 <- seg$pmd[condition == name]
+    print(seg1)
+    # Set the file name for the PDF
+    if (isTRUE(f)) {
+    	pdf(paste0(o,"/", name, "_pmds_plots.pdf"))
+    	par(mfrow = c(1, 1), bg = "white")
+    smoothScatter(seg1$beta,seg1$std, ylim=c(0,0.5), xlim=c(0,1), ylab="Standard deviation", xlab="mean DNA methylation", main=paste("MethyLasso segments \n ",name))
+    abline(v = 0.7, col = rgb(1, 0, 0, alpha = 0.5)) 
+    null = dev.off()
+    }
+	
     # LMR, UMR and DMV
     lmr_umr_dmv <- segments$lmr_umr_valley[condition == name]
     write.table(
