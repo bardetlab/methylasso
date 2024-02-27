@@ -274,7 +274,7 @@ data = data[coverage >= mindepth]
     # PMD
     pmd <- segments$pmd[condition == name]
     write.table(
-      pmd[, .(chr = chr, start = start, end = end, num.cpgs = num.cpgs, meth = beta, std = std, category = category)],
+      pmd[, .(chr = chr, start = start, end = end, num.cpgs = num.cpgs, meth = round(beta*100, 2), std = round(std,3), category = category)],
       file = paste(o, "/", name, "_pmd.tsv", sep = ""),
       quote = FALSE, row.names = FALSE, sep = "\t"
     )
@@ -285,15 +285,15 @@ data = data[coverage >= mindepth]
     if (isTRUE(f)) {
     	pdf(paste0(o,"/", name, "_pmds_plots.pdf"))
     	par(mfrow = c(1, 1), bg = "white")
-    smoothScatter(seg1$beta,seg1$std, ylim=c(0,0.5), xlim=c(0,1), ylab="Standard deviation", xlab="mean DNA methylation", main=paste("MethyLasso segments \n", name))
-    abline(v = 0.7, col = rgb(1, 0, 0, alpha = 0.5)) 
+    smoothScatter(seg1$beta*100,seg1$std, ylim=c(0,0.5), xlim=c(0,100), ylab="Standard deviation", xlab="DNA methylation (%)", main=paste("MethyLasso segments \n", name))
+    abline(v = 70, col = rgb(1, 0, 0, alpha = 0.5)) 
     null = dev.off()
     }
 	  
     # LMR, UMR and DMV
     lmr_umr_dmv <- segments$lmr_umr_valley[condition == name]
     write.table(
-      lmr_umr_dmv[, .(chr = chr, start = start, end = end, num.cpgs = num.cpgs, meth = beta, std = std, category = category)],
+      lmr_umr_dmv[, .(chr = chr, start = start, end = end, num.cpgs = num.cpgs,meth = round(beta*100, 2), std = round(std,3), category = category)],
       file = paste(o, "/", name, "_lmr_umr_dmv.tsv", sep = ""),
       quote = FALSE, row.names = FALSE, sep = "\t"
     )
@@ -325,11 +325,11 @@ ref = n2
   differences = MethyLasso:::annotate_differences(diff_call, segments)
 
   write.table(
-    differences[, .(chr = chr, start = start, end = end, num.cpgs1 = num.cpgs, num.cpgs2 = num.cpgs.ref, cov.score = coverage.score, meth1 = beta, meth2 = beta.ref, diff = diff, pvalue = pval, FDR = fdr, annotation = switch)],
+    differences[, .(chr = chr, start = start, end = end, num.cpgs1 = num.cpgs, num.cpgs2 = num.cpgs.ref, cov.score = round(coverage.score, 3), meth1 = round(beta * 100, 2), meth2 = round(beta.ref * 100, 2), diff = round(diff * 100, 2), pvalue = round(pval, 4), FDR = round(fdr, 4), annotation = switch)],
     file = paste(o, "/", n1, "_vs_", n2, "_dmrs.tsv", sep = ""),
     quote = FALSE, row.names = FALSE, sep = "\t"
   )
-
+	 
   # Create DMR plot
   if (isTRUE(f)) {
     # DMR scatterplot
@@ -370,10 +370,11 @@ ref = n2
   diff_call = MethyLasso:::call_differences(data, ret, min.diff = d, pval.cutoff = p, fdr.cutoff = q, min.num.cpgs = n, cov.score = r * 100, ncores = t, verbose = !quiet)
 
   write.table(
-    diff_call[, .(chr = chr, start = start, end = end, num.cpgs1 = num.cpgs, num.cpgs2 = num.cpgs.ref, cov.score = coverage.score, meth1 = beta, meth2 = beta.ref, diff = diff, pvalue = pval, FDR = fdr)],
+    diff_call[, .(chr = chr, start = start, end = end, num.cpgs1 = num.cpgs, num.cpgs2 = num.cpgs.ref, cov.score = round(coverage.score, 3), meth1 = round(beta * 100, 2), meth2 = round(beta.ref * 100, 2), diff = round(diff * 100, 2), pvalue = round(pval, 4), FDR = round(fdr, 4))],
     file = paste(o, "/", n1, "_vs_", n2, "_dmrs.tsv", sep = ""),
     quote = FALSE, row.names = FALSE, sep = "\t"
   )
+	 
   # Create DMR plot
   if (isTRUE(f)) {
     # DMR scatterplot
@@ -411,7 +412,7 @@ seg <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = 1,
     # PMD
     pmd <- segments$pmd[condition == name]
     write.table(
-      pmd[, .(chr = chr, start = start, end = end, num.cpgs = num.cpgs, meth = beta, std = std, category = category)],
+      pmd[, .(chr = chr, start = start, end = end, num.cpgs = num.cpgs, meth = round(beta*100, 2), std = round(std,3), category = category)],
       file = paste(o, "/", name, "_pmd.tsv", sep = ""),
       quote = FALSE, row.names = FALSE, sep = "\t"
     )
@@ -422,15 +423,15 @@ seg <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = 1,
     if (isTRUE(f)) {
     	pdf(paste0(o,"/", name, "_pmds_plots.pdf"))
     	par(mfrow = c(1, 1), bg = "white")
-    smoothScatter(seg1$beta,seg1$std, ylim=c(0,0.5), xlim=c(0,1), ylab="Standard deviation", xlab="mean DNA methylation", main=paste("MethyLasso segments \n ",name))
-    abline(v = 0.7, col = rgb(1, 0, 0, alpha = 0.5)) 
+    smoothScatter(seg1$beta*100,seg1$std, ylim=c(0,0.5), xlim=c(0,100), ylab="Standard deviation", xlab="DNA methylation (%)", main=paste("MethyLasso segments \n ",name))
+    abline(v = 70, col = rgb(1, 0, 0, alpha = 0.5)) 
     null = dev.off()
     }
 	
     # LMR, UMR and DMV
     lmr_umr_dmv <- segments$lmr_umr_valley[condition == name]
     write.table(
-      lmr_umr_dmv[, .(chr = chr, start = start, end = end, num.cpgs = num.cpgs, meth = beta, std = std, category = category)],
+      lmr_umr_dmv[, .(chr = chr, start = start, end = end, num.cpgs = num.cpgs, meth = round(beta*100, 2), std = round(std,3), category = category)],
       file = paste(o, "/", name, "_lmr_umr_dmv.tsv", sep = ""),
       quote = FALSE, row.names = FALSE, sep = "\t"
     )
