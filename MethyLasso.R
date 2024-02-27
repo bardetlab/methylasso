@@ -280,7 +280,7 @@ data = data[coverage >= mindepth]
     )
 
     seg1 <- seg$pmd[condition == name]
-    print(seg1)
+    
     # Set the file name for the PDF
     if (isTRUE(f)) {
     	pdf(paste0(o,"/", name, "_pmds_plots.pdf"))
@@ -418,7 +418,7 @@ seg <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = 1,
     )
 	  
     seg1 <- seg$pmd[condition == name]
-    print(seg1)
+    
     # Set the file name for the PDF
     if (isTRUE(f)) {
     	pdf(paste0(o,"/", name, "_pmds_plots.pdf"))
