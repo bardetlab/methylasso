@@ -17,4 +17,5 @@ dependencies:
   - r-scales
   - r-matrix
   - r-matrixstats
+  - r-r.utils
   
