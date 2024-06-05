@@ -12,16 +12,16 @@ NULL
 #' @param lmr_max_beta segments with mean methylation below this threshold (default 0.5) and above umr_max_beta are LMRs
 #' @param pmd_max_beta the maximum methylation value a segment group can have to be considered a PMD (default 0.70)
 #' @param valley_max_beta Valleys must have mean methylation below this threshold (default 0.1)
-#' @param pmd_valley_min_width Valleys and PMDs must have at least this size (default 0)
+#' @param pmd_valley_min_width Valleys and PMDs must have at least this size (default 5000)
 #' @param max_distance Within a segment, the distance between successive CpGs must never be larger than this distance,
-#'   and its mean must also be below it. (default )
+#'   and its mean must also be below it. (default 500)
 #' @param min_num_cpgs minimum number of CpGs to classify as LMR/UMR (default 4)
-#' @param min_width minimum width to classify as LMR/UMR (default 10)
+#' @param min_width minimum width to classify as LMR/UMR (default 30)
 #' @param flank.width minimum width of flanking segments (default 300)
-#' @param flank.dist.max maximum distance of UMR/LMR to flanking segment (default 0)
+#' @param flank.dist.max maximum distance of UMR/LMR to flanking segment (default 5000)
 #' @param flank.num.cpgs Consider as small UMR/LMRs those which have num.cpgs smaller than this threshold (default 10) 
 #' @param flank.beta.min For small UMR/LMRs, require that flanking segments have mean methylation above this threshold (default 0.5)
-#' @param umr_large_width large UMRs are accepted when larger than this (default )
+#' @param umr_large_width large UMRs are accepted when larger than this (default 500)
 #' @param umr_large_density large UMRs are accepted when more dense than this (default 0.03)
 #' @param split.pmds whether to split PMDs which contain UMRs (default TRUE)
 #' @param merge.pmds whether to merge adjacent PMDs into a single region (default TRUE)
@@ -247,6 +247,10 @@ segment_methylation = function(data, ret, ncores=1,min_num_cpgs=4 , ...) {
 #' 
 #' single chromosome version
 #' 
+#' @param min.diff minimum threshold for which a difference should be considered (default 0.1)
+#' @param tol_val fused values below tol_val from each other are considered equal (default 0.01)
+#' 
+
 call_differences_singlechr = function(data, ret, min.diff=0.1,min.delta.diff=0.1, tol_val=0.01) {
   #call segments and bin original data along them
   if (ret$detection.type != "difference") stop("Please call call_differences on the result of difference_detection")
@@ -333,7 +337,9 @@ call_differences_singlechr = function(data, ret, min.diff=0.1,min.delta.diff=0.1
 #' @param data the input data frame
 #' @param ret the output of difference_detection
 #' @param min.diff minimum threshold for which a difference should be considered (default 0.1)
-#' @param fdr.cutoff cutoff for FDR (default 0.05)
+#' @param pval.cutoff cutoff for p-value (default 0.05)
+#' @param fdr.cutoff cutoff for FDR (default 1 off)
+#' @param cov.score cutoff for CpG coverage (default 70)
 #' @param min.num.cpgs Require reported differences to have a certain minimum number of CpGs (default 4)
 #' @param tol_val fused values below tol_val from each other are considered equal (default 0.01)
 #' @param ncores number of cores to parallelize on (default=1)
