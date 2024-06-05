@@ -59,19 +59,19 @@ help <- function(){
 
 
 ## Default arguments
-c = 5
-n = 4
-m = 0.7
-d = 0.1
-p = 0.05
-q = 1
-r = 0.7
-t = 1
-mC = 4
-uC = 5
-s = FALSE
-f = TRUE
-quiet = FALSE
+mC = 4 # Column number containing count of methylated Cs
+uC = 5 # Column number containing count of unmethylated Cs
+c = 5 # Minimum coverage per CpG
+n = 4 # Minimum number of CpGs in LMRs, UMRS, DMVs and DMRs
+m = 0.7 # Maximum mean methylation for PMDs
+d = 0.1 # Minimum methylation difference for DMRs
+p = 0.05 # P-value threshold for DMRs
+q = 1 # Q-value (FDR) threshold for DMRs
+r = 0.7 # Replicate coverage score for CpGs in DMRs
+s = FALSE # Skip LMR, UMR, DMV and PMD identification 
+t = 1 # Number of threads to use
+f = TRUE # Output figures in pdf format
+quiet = FALSE # Do not print processing information
 
 
 ## Save values of each argument
