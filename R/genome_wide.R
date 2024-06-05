@@ -1,4 +1,4 @@
-#' @include MethyLasso.R
+#' @include dependencies.R
 NULL
 
 #' Helper to combine two return values from signal/difference calls
