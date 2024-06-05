@@ -5,7 +5,7 @@ NULL
 #' 
 #' @param data the input data frame
 #' @param ret the output of signal_detection
-#' @param std_lambda2 the value of the fusion penalty for PMD detection (default is 1000)
+#' @param pmd_lambda2 the value of the fusion penalty for PMD detection (default is 1000)
 #' @param pmd_std_threshold the value of the threshold on the std (default 0.15) used for PMDs
 #' @param umr_std_threshold the value of the threshold on the std (default 0.1)  use for UMRs
 #' @param umr_max_beta segments with mean methylation below this threshold are UMRs (default 0.1)
@@ -28,7 +28,7 @@ NULL
 #' @param drop whether to drop verbose columns and unannotated segments (default TRUE)
 #' @param tol_val fused values below tol_val from each other are considered equal (default 0.01)
 #' 
-segment_methylation_singlechr = function(data, ret, std_lambda2=1000, pmd_std_threshold=0.15, umr_std_threshold=0.1,
+segment_methylation_singlechr = function(data, ret, pmd_lambda2=1000, pmd_std_threshold=0.15, umr_std_threshold=0.1,
                                          umr_max_beta=0.1, lmr_max_beta=0.5, pmd_max_beta=0.75, valley_max_beta=0.1, pmd_valley_min_width=5000,
                                          max_distance=500, min_num_cpgs=4, min_width=30, flank.width=300, flank.dist.max=5000,
                                          flank.num.cpgs=10, flank.beta.min=0.5, umr_large_width=500, umr_large_density=0.03,
