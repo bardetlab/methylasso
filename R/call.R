@@ -90,7 +90,7 @@ segment_methylation_singlechr = function(data, ret, pmd_lambda2=1000, pmd_std_th
   seg_call[beta<umr_max_beta&std<umr_std_threshold&(is.V==T&width>umr_large_width&num.cpgs/width>umr_large_density),category:="UMR"]
   
   # Fuse std values weighted by width
-  seg_call[,fused_std:=MethyLasso:::weighted_1d_flsa(std,width,std_lambda2),by=c("condition")]
+  seg_call[,fused_std:=MethyLasso:::weighted_1d_flsa(std,width,pmd_lambda2),by=c("condition")]
   pmd.df = as.data.frame(seg_call[,.(estimate_id,start,beta=fused_std,betahat=std,pseudoweight)])
   std_call = as.data.table(MethyLasso:::segment_methylation_helper(pmd.df,tol_val=tol_val))
   setnames(std_call,c("beta","betahat"),c("fused_std","std"))
