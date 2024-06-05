@@ -24,7 +24,7 @@ combine_ret = function(ret1, ret2) {
 #'  pos is the genomic coordinate of each CpG, sorted increasingly. Nmethyl is the number
 #'  of methylated reads. Ntot is the number of unmethylated reads.
 #' @param optimize_lambda2 whether to optimize fusion penalty or not (default FALSE)
-#' @param lambda2 the initial value of lambda2 (default 50)
+#' @param lambda2 the initial value of lambda2 (default 25)
 #' @param max_lambda2 the maximum value of lambda2 (default 1000)
 #' @param optimize_hyper whether to optimize it (default FALSE)
 #' @param hyper the value of the hyperparameter (default 100)
@@ -35,7 +35,7 @@ combine_ret = function(ret1, ret2) {
 #' @param ncores number of cores to parallelize on (default 1)
 #' 
 #' @export
-signal_detection = function(data, optimize_lambda2=F, lambda2=50, max_lambda2=1000,
+signal_detection = function(data, optimize_lambda2=F, lambda2=25, max_lambda2=1000,
                             optimize_hyper=F, hyper=100, nouter=20, bf_per_kb=50, tol_val=0.01,
                             max_iter=30, ncores=1) {
   chrs=data[,unique(chr)]
@@ -61,7 +61,7 @@ signal_detection = function(data, optimize_lambda2=F, lambda2=50, max_lambda2=10
 #' 
 #' @export
 
-signal_detection_fast = function(data, lambda2=50, tol_val=0.01, max_iter=1, ncores=1,verbose = TRUE) {
+signal_detection_fast = function(data, lambda2=25, tol_val=0.01, max_iter=1, ncores=1,verbose = TRUE) {
   chrs=data[,unique(chr)]
   registerDoParallel(cores=ncores)
   ret = foreach (ch=chrs,.combine=MethyLasso:::combine_ret, .errorhandling = "remove") %dopar% {
@@ -88,7 +88,7 @@ signal_detection_fast = function(data, lambda2=50, tol_val=0.01, max_iter=1, nco
 #' 
 #' @export
 #' @name difference_detection
-difference_detection = function(data, ref, optimize_lambda2=F, lambda2=50, max_lambda2=1000,
+difference_detection = function(data, ref, optimize_lambda2=F, lambda2=25, max_lambda2=1000,
                                 optimize_hyper=F, hyper=100, nouter=20, bf_per_kb=50, tol_val=0.01,
                                 max_iter=30, ncores=1) {
   chrs=data[,unique(chr)]
@@ -118,7 +118,7 @@ difference_detection = function(data, ref, optimize_lambda2=F, lambda2=50, max_l
 #' 
 #' @export&& verbose
 #' 
-difference_detection_fast = function(data, ref, lambda2=50, tol_val=0.01, max_iter=1, ncores=1,verbose = TRUE) {
+difference_detection_fast = function(data, ref, lambda2=25, tol_val=0.01, max_iter=1, ncores=1,verbose = TRUE) {
   chrs=data[,unique(chr)]
   registerDoParallel(cores=ncores)
   ret = foreach (ch=chrs,.combine=MethyLasso:::combine_ret, .errorhandling = "remove") %dopar% {
