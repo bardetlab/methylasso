@@ -9,7 +9,7 @@ NULL
 #' 
 #' single chromosome
 #' 
-difference_detection_fast_singlechr = function(data, ref, lambda2=50,
+difference_detection_fast_singlechr = function(data, ref, lambda2=25,
                                                tol_val=0.01, max_iter=1) {
   ret = MethyLasso:::signal_detection_fast_singlechr(data,lambda2,tol_val,max_iter)
   est = as.data.table(ret$estimates)
