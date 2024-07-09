@@ -12,7 +12,7 @@ LinkingTo: Rcpp, RcppEigen, BH, RcppGSL
 RoxygenNote: 6.1.1
 Encoding: UTF-8
 Collate: 
-    'MethyLasso.R'
+    'dependencies.R'
     'call.R'
     'fast_diff.R'
     'genome_wide.R'
