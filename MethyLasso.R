@@ -7,13 +7,15 @@ message("*      *   * * * *      *      *     *     *       * * * *  *       *  
 
 
 ## Load libraries
-suppressPackageStartupMessages(library(MethyLasso))
-suppressPackageStartupMessages(library(data.table))
-suppressPackageStartupMessages(library(ggplot2))
-suppressPackageStartupMessages(library(foreach))
-suppressPackageStartupMessages(library(doParallel))
-suppressPackageStartupMessages(library(stringr))
-suppressPackageStartupMessages(library(R.utils))
+suppressPackageStartupMessages({
+  library(MethyLasso)
+  library(data.table)
+  library(ggplot2)
+  library(foreach)
+  library(doParallel)
+  library(stringr)
+  library(R.utils)
+})
 
 ## Retrieve arguments
 args=commandArgs(TRUE)
@@ -49,6 +51,23 @@ help <- function(){
     cat(" -t\tNumber of threads to use (default 1)\n")
     cat(" -o\tOutput directory (default current directory)\n") 
     cat(" -f\tOutput figures in pdf format (default TRUE)\n")  
+    cat("\nADDITIONAL OPTIONS FOR ADVANCED CONFIGURATIONS:\n")
+    cat(" --umrlmr_lambda2\tSegmentation value for UMR/LMR identification (default 25)\n")
+    cat(" --tol_val\t\tTolerance value for optimization (default 0.01)\n")
+    cat(" --pmd_lambda2\t\tSegmentation value for PMD identification (default 1000)\n")
+    cat(" --pmd_std_threshold\tStandard deviation threshold for PMD (default 0.15)\n")
+    cat(" --umr_std_threshold\tStandard deviation threshold for UMR (default 0.1)\n")
+    cat(" --umr_max_beta\t\tMaximum methylation for UMR (default 0.1)\n")
+    cat(" --lmr_max_beta\t\tMaximum methylation for LMR (default 0.5)\n")
+    cat(" --valley_max_beta\tMaximum methylation for valleys (default 0.1)\n")
+    cat(" --pmd_valley_min_width\tMinimum width for PMD valleys (default 5000)\n")
+    cat(" --max_distance\t\tMaximum distance for merging segments (default 500)\n")
+    cat(" --min_width\t\tMinimum width for segments (default 30)\n")
+    cat(" --umr_large_width\tLarge width threshold for UMRs (default 500)\n")
+    cat(" --umr_large_density\tDensity threshold for large UMRs (default 0.03)\n")
+    cat(" --dmr_lambda2\t\tSegmentation value for DMR identification (default 25)\n")
+    cat(" --min.overlap.pc\tMinimum overlap percentage for DMRs (default 10)\n")
+    cat("\n")
     cat("\nOTHERS OPTIONS:\n")
     cat(" --quiet\tDo not print processing information (default FALSE)\n")
     cat(" --version \tPrint version\n")
@@ -72,6 +91,22 @@ s = FALSE # Skip LMR, UMR, DMV and PMD identification
 t = 1 # Number of threads to use
 f = TRUE # Output figures in pdf format
 quiet = FALSE # Do not print processing information
+umrlmr_lambda2 = 25 # Segmentation value for UMR/LMR identification
+tol_val = 0.01 # Tolerance value for optimization
+pmd_lambda2 = 1000 # Segmentation value for PMD identification
+pmd_std_threshold = 0.15 # Standard deviation threshold for PMD
+umr_std_threshold = 0.1 # Standard deviation threshold for UMR
+umr_max_beta = 0.1 # Maximum mean methylation for UMR
+lmr_max_beta = 0.5 # Maximum mean methylation for LMR
+valley_max_beta = 0.1 # Maximum beta value for valleys
+pmd_valley_min_width = 5000 # Minimum width for PMD valleys
+max_distance = 500 # Maximum distance for merging segments
+min_width = 30 # Minimum width for segments
+umr_large_width = 500 # Large width threshold for UMRs
+umr_large_density = 0.03 # Density threshold for large UMRs
+dmr_lambda2 = 25 #  Segmentation value for DMR identification
+min.overlap.pc = 10 # Minimum overlap percentage for DMRs
+
 
 
 ## Save values of each argument
@@ -259,15 +294,16 @@ data = data[coverage >= mindepth]
     message("Step 1: Fit of methylation signal\n")
   }
 
-  ret <- MethyLasso:::signal_detection_fast(data, lambda2 = 25, ncores = t, verbose = !quiet)
+  ret <- MethyLasso:::signal_detection_fast(data, lambda2 = umrlmr_lambda2, tol_val=tol_val, ncores = t, verbose = !quiet)
 
   # SEGMENT
   if (isFALSE(quiet)) {
     message("\nStep 2: Segmentation and identification of PMDs, LMRs, UMRs and DMVs\n")
   }
 
-  segments <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = m, min_num_cpgs = n)
-  seg <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = 1, pmd_std_threshold=0, min_num_cpgs = n)
+  segments <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = m, min_num_cpgs = n, pmd_lambda2=pmd_lambda2, pmd_std_threshold=pmd_std_threshold, umr_std_threshold=umr_std_threshold, umr_max_beta=umr_max_beta, lmr_max_beta=lmr_max_beta, valley_max_beta=valley_max_beta, pmd_valley_min_width=pmd_valley_min_width, max_distance=max_distance, min_width=min_width, umr_large_width=umr_large_width, umr_large_density=umr_large_density, tol_val=tol_val)
+  #to obtain all segments for plot
+  seg <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = 1, pmd_std_threshold=0, min_num_cpgs = n, pmd_lambda2=pmd_lambda2, umr_std_threshold=umr_std_threshold ,umr_max_beta=umr_max_beta, lmr_max_beta=lmr_max_beta, valley_max_beta=valley_max_beta, pmd_valley_min_width=pmd_valley_min_width, max_distance=max_distance, min_width=min_width ,umr_large_width=umr_large_width, umr_large_density=umr_large_density, tol_val=tol_val)
   # Save file
   for (i in seq_along(data_list)) {
     name <- nam[i]
@@ -313,16 +349,16 @@ ref = n2
     message("\nStep 1: Fit of methylation signal based on both conditions\n")
   }
 
-  ret <- MethyLasso:::difference_detection_fast(data, ref = ref, lambda2 = 25, ncores = t, verbose = !quiet)
+  ret <- MethyLasso:::difference_detection_fast(data, ref = ref, lambda2 = dmr_lambda2, ncores = t, verbose = !quiet)
 
   # SEGMENT AND CALL DMRS
   if (isFALSE(quiet)) {
     message("\nStep 2: Segmentation and identification of differentially methylated regions (DMRs)\n")
   }
 
-  diff_call = MethyLasso:::call_differences(data, ret, min.diff = d, pval.cutoff = p, fdr.cutoff = q, cov.score = r * 100, ncores = t, verbose = !quiet, min.num.cpgs = n)
+  diff_call = MethyLasso:::call_differences(data, ret, min.diff = d, pval.cutoff = p, fdr.cutoff = q, cov.score = r * 100, ncores = t, verbose = !quiet, min.num.cpgs = n, tol_val=tol_val)
 
-  differences = MethyLasso:::annotate_differences(diff_call, segments)
+  differences = MethyLasso:::annotate_differences(diff_call, segments,min.overlap.pc=min.overlap.pc)
 
   write.table(
     differences[, .(chr = chr, start = start, end = end, num.cpgs1 = num.cpgs, num.cpgs2 = num.cpgs.ref, cov.score = round(coverage.score, 3), meth1 = round(beta * 100, 2), meth2 = round(beta.ref * 100, 2), diff = round(diff * 100, 2), pvalue = round(pval, 4), FDR = round(fdr, 4), annotation = switch)],
@@ -360,14 +396,14 @@ ref = n2
     message("\nStep 1: Fit of methylation signal based on both conditions\n")
   }
 
-  ret <- MethyLasso:::difference_detection_fast(data, ref = ref, lambda2 = 25, ncores = t, verbose = !quiet)
+  ret <- MethyLasso:::difference_detection_fast(data, ref = ref, lambda2 = dmr_lambda2, ncores = t, verbose = !quiet)
 
 # SEGMENT AND CALL DMRS
   if (isFALSE(quiet)) {
     message("\nStep 2: Segmentation and identification of differentially methylated regions (DMRs)\n")
   }
 
-  diff_call = MethyLasso:::call_differences(data, ret, min.diff = d, pval.cutoff = p, fdr.cutoff = q, min.num.cpgs = n, cov.score = r * 100, ncores = t, verbose = !quiet)
+  diff_call = MethyLasso:::call_differences(data, ret, min.diff = d, pval.cutoff = p, fdr.cutoff = q, cov.score = r * 100, ncores = t, verbose = !quiet, min.num.cpgs = n, tol_val=tol_val)
 
   write.table(
     diff_call[, .(chr = chr, start = start, end = end, num.cpgs1 = num.cpgs, num.cpgs2 = num.cpgs.ref, cov.score = round(coverage.score, 3), meth1 = round(beta * 100, 2), meth2 = round(beta.ref * 100, 2), diff = round(diff * 100, 2), pvalue = round(pval, 4), FDR = round(fdr, 4))],
@@ -396,15 +432,16 @@ ref = n2
     message("Step 1: Fit of methylation signal\n")
   }
   # FIT
-  ret <- MethyLasso:::signal_detection_fast(data, lambda2 = 25, ncores = t, verbose = !quiet)
+  ret <- MethyLasso:::signal_detection_fast(data, tol_val=tol_val, ncores = t, verbose = !quiet)
 
   # SEGMENT
   if (isFALSE(quiet)) {
     message("\nStep 2: Segmentation and identification of PMDs, LMRs, UMRs and DMVs\n")
   }
 
-segments <- MethyLasso:::segment_methylation(data, ret, ncores = t, min_num_cpgs = n, pmd_max_beta = m)
-seg <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = 1, pmd_std_threshold=0, min_num_cpgs = n)
+  segments <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = m, min_num_cpgs = n, pmd_lambda2=pmd_lambda2, pmd_std_threshold=pmd_std_threshold, umr_std_threshold=umr_std_threshold, umr_max_beta=umr_max_beta, lmr_max_beta=lmr_max_beta, valley_max_beta=valley_max_beta, pmd_valley_min_width=pmd_valley_min_width, max_distance=max_distance, min_width=min_width, umr_large_width=umr_large_width, umr_large_density=umr_large_density, tol_val=tol_val)
+  #to obtain all segments for plot
+  seg <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = 1, pmd_std_threshold=0, min_num_cpgs = n, pmd_lambda2=pmd_lambda2, umr_std_threshold=umr_std_threshold ,umr_max_beta=umr_max_beta, lmr_max_beta=lmr_max_beta, valley_max_beta=valley_max_beta, pmd_valley_min_width=pmd_valley_min_width, max_distance=max_distance, min_width=min_width ,umr_large_width=umr_large_width, umr_large_density=umr_large_density, tol_val=tol_val)
 	 
   # Save file
   for (i in seq_along(data_list)) {
