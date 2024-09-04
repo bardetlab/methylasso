@@ -79,8 +79,29 @@ OR
 |--version | Print version|
 |--help | Print help|
 
-    
-## 6. &emsp;Output files and plots  
+## 6. &emsp;Additional options for advances configurations 
+
+|**argument**|**description**|
+| ---------- | --- |
+|--umrlmr_lambda2 | Segmentation value for UMR/LMR identification (default 25)|
+|--tol_val | Tolerance value for optimization (default 0.01)|
+|--pmd_lambda2 | Segmentation value for PMD identification (default 1000)|
+|--pmd_std_threshold | Standard deviation threshold for PMD (default 0.15)|
+|--umr_std_threshold | Standard deviation threshold for UMR (default 0.1)|
+|--umr_max_beta | Maximum methylation for UMR (default 0.1)|
+|--lmr_max_beta\ | Maximum methylation for LMR (default 0.5)|
+|--valley_max_beta | Maximum methylation for valleys (default 0.1)|
+|--pmd_valley_min_width | Minimum width for PMD valleys (default 5000)|
+|--max_distance | Maximum distance for merging segments (default 500)|
+|--min_width | Minimum width for segments (default 30)|
+|--umr_large_width | Large width threshold for UMRs (default 500)|
+|--umr_large_density | Density threshold for large UMRs (default 0.03)|
+|--dmr_lambda2 | Segmentation value for DMR identification (default 25)|
+|--min.overlap.pc | Minimum overlap percentage for DMRs (default 10)|
+
+
+
+## 7. &emsp;Output files and plots  
 
 Two histograms are generated for each replicate in each condition in a pdf file name_replicate_plots.pdf containing: a distribution of the sequencing depth and distribution of the methylation of CpGs obtained after applying the minimum coverage per CpG (option -m).
 
@@ -96,7 +117,7 @@ If the first part is not run (option -s), the last annotation column will not be
 After DMRs identification, a smooth scatter plot containing the mean methylation 1 and mean methylation 2 of each DMRs is generated in a pdf file name1_vs_name2_dmrs_plot.pdf.
 
     
-## 7. &emsp;Example
+## 8. &emsp;Example
 
 An example of command line to run MethyLasso is provided using files from Hansen et al. 2011 comparing healthy and colon cancer conditions with 3 replicates for each ([healthy_1](https://g-948214.d2cf88.03c0.data.globus.org/input_files/WGBS_colon-primary-normal_1_meth.bed.gz), [healthy_2](https://g-948214.d2cf88.03c0.data.globus.org/input_files/WGBS_colon-primary-normal_2_meth.bed.gz), [healthy_3](https://g-948214.d2cf88.03c0.data.globus.org/input_files/WGBS_colon-primary-normal_3_meth.bed.gz), [cancer_1](https://g-948214.d2cf88.03c0.data.globus.org/input_files/WGBS_colon-primary-tumor_1_meth.bed.gz), [cancer_2](https://g-948214.d2cf88.03c0.data.globus.org/input_files/WGBS_colon-primary-tumor_2_meth.bed.gz), [cancer_3](https://g-948214.d2cf88.03c0.data.globus.org/input_files/WGBS_colon-primary-tumor_3_meth.bed.gz)). The input files contain for each CpG , their genomic coordinates in the first three columns (chr / start / end), the total Count of Cs in columns four (--cov 4) and the percentage of methylation in columns 5 (--meth 5). DMRs will be identified with a q-value threshold 0.05 (-q 0.05).
 
