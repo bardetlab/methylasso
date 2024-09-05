@@ -67,6 +67,13 @@ help <- function(){
     cat(" --umr_large_density\tDensity threshold for large UMRs (default 0.03)\n")
     cat(" --dmr_lambda2\t\tSegmentation value for DMR identification (default 25)\n")
     cat(" --min.overlap.pc\tMinimum overlap percentage for DMRs (default 10)\n")
+    cat(" --flank.width\t\tMinimum width of flanking segments (default 300)\n")
+    cat(" --flank.dist.max\tMaximum distance of UMR/LMR to flanking segment (default 5000)\n")
+    cat(" --flank.num.cpgs\tConsider as small UMR/LMRs those which have num.cpgs smaller than this threshold (default 10)\n")
+    cat(" --flank.beta.min\tFor small UMR/LMRs, require that flanking segments have mean methylation above this threshold (default 0.5)\n")
+    cat(" --split.pmds\t\tWhether to split PMDs which contain UMRs (default TRUE)\n")
+    cat(" --merge.pmds\t\tWhether to merge adjacent PMDs into a single region (default TRUE)\n")
+    cat(" --drop\t\t\tWhether to drop verbose columns and unannotated segments (default TRUE)\n")
     cat("\n")
     cat("\nOTHERS OPTIONS:\n")
     cat(" --quiet\tDo not print processing information (default FALSE)\n")
@@ -106,6 +113,13 @@ umr_large_width = 500 # Large width threshold for UMRs
 umr_large_density = 0.03 # Density threshold for large UMRs
 dmr_lambda2 = 25 #  Segmentation value for DMR identification
 min.overlap.pc = 10 # Minimum overlap percentage for DMRs
+flank.width = 300 # Minimum width of flanking segments
+flank.dist.max = 5000 # Maximum distance of UMR/LMR to flanking segment
+flank.num.cpgs = 10 # Threshold for considering small UMR/LMRs
+flank.beta.min = 0.5 # Minimum methylation for flanking segments of small UMR/LMRs
+split.pmds = TRUE # Whether to split PMDs which contain UMRs
+merge.pmds = TRUE # Whether to merge adjacent PMDs
+drop = TRUE # Whether to drop verbose columns and unannotated segments
 
 
 
@@ -301,10 +315,11 @@ data = data[coverage >= mindepth]
     message("\nStep 2: Segmentation and identification of PMDs, LMRs, UMRs and DMVs\n")
   }
 
-  segments <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = m, min_num_cpgs = n, pmd_lambda2=pmd_lambda2, pmd_std_threshold=pmd_std_threshold, umr_std_threshold=umr_std_threshold, umr_max_beta=umr_max_beta, lmr_max_beta=lmr_max_beta, valley_max_beta=valley_max_beta, pmd_valley_min_width=pmd_valley_min_width, max_distance=max_distance, min_width=min_width, umr_large_width=umr_large_width, umr_large_density=umr_large_density, tol_val=tol_val)
+
+
+  segments <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = m, min_num_cpgs = n, pmd_lambda2=pmd_lambda2, pmd_std_threshold=pmd_std_threshold, umr_std_threshold=umr_std_threshold, umr_max_beta=umr_max_beta, lmr_max_beta=lmr_max_beta, valley_max_beta=valley_max_beta, pmd_valley_min_width=pmd_valley_min_width, max_distance=max_distance, min_width=min_width, umr_large_width=umr_large_width, umr_large_density=umr_large_density, flank.width=flank.width, flank.dist.max=flank.dist.max, flank.num.cpgs=flank.num.cpgs, flank.beta.min=flank.beta.min, split.pmds=split.pmds,merge.pmds=merge.pmds, drop=drop, tol_val=tol_val)
   #to obtain all segments for plot
-  seg <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = 1, pmd_std_threshold=0, min_num_cpgs = n, pmd_lambda2=pmd_lambda2, umr_std_threshold=umr_std_threshold ,umr_max_beta=umr_max_beta, lmr_max_beta=lmr_max_beta, valley_max_beta=valley_max_beta, pmd_valley_min_width=pmd_valley_min_width, max_distance=max_distance, min_width=min_width ,umr_large_width=umr_large_width, umr_large_density=umr_large_density, tol_val=tol_val)
-  # Save file
+  seg <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = 1, pmd_std_threshold=0, min_num_cpgs = n, pmd_lambda2=pmd_lambda2, umr_std_threshold=umr_std_threshold ,umr_max_beta=umr_max_beta, lmr_max_beta=lmr_max_beta, valley_max_beta=valley_max_beta, pmd_valley_min_width=pmd_valley_min_width, max_distance=max_distance, min_width=min_width ,umr_large_width=umr_large_width, umr_large_density=umr_large_density, flank.width=flank.width, flank.dist.max=flank.dist.max, flank.num.cpgs=flank.num.cpgs, flank.beta.min=flank.beta.min, split.pmds=split.pmds,merge.pmds=merge.pmds, drop=drop, tol_val=tol_val)  # Save file
   for (i in seq_along(data_list)) {
     name <- nam[i]
     # PMD
@@ -439,10 +454,11 @@ ref = n2
     message("\nStep 2: Segmentation and identification of PMDs, LMRs, UMRs and DMVs\n")
   }
 
-  segments <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = m, min_num_cpgs = n, pmd_lambda2=pmd_lambda2, pmd_std_threshold=pmd_std_threshold, umr_std_threshold=umr_std_threshold, umr_max_beta=umr_max_beta, lmr_max_beta=lmr_max_beta, valley_max_beta=valley_max_beta, pmd_valley_min_width=pmd_valley_min_width, max_distance=max_distance, min_width=min_width, umr_large_width=umr_large_width, umr_large_density=umr_large_density, tol_val=tol_val)
+ 
+
+  segments <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = m, min_num_cpgs = n, pmd_lambda2=pmd_lambda2, pmd_std_threshold=pmd_std_threshold, umr_std_threshold=umr_std_threshold, umr_max_beta=umr_max_beta, lmr_max_beta=lmr_max_beta, valley_max_beta=valley_max_beta, pmd_valley_min_width=pmd_valley_min_width, max_distance=max_distance, min_width=min_width, umr_large_width=umr_large_width, umr_large_density=umr_large_density, flank.width=flank.width, flank.dist.max=flank.dist.max, flank.num.cpgs=flank.num.cpgs, flank.beta.min=flank.beta.min, split.pmds=split.pmds,merge.pmds=merge.pmds, drop=drop, tol_val=tol_val)
   #to obtain all segments for plot
-  seg <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = 1, pmd_std_threshold=0, min_num_cpgs = n, pmd_lambda2=pmd_lambda2, umr_std_threshold=umr_std_threshold ,umr_max_beta=umr_max_beta, lmr_max_beta=lmr_max_beta, valley_max_beta=valley_max_beta, pmd_valley_min_width=pmd_valley_min_width, max_distance=max_distance, min_width=min_width ,umr_large_width=umr_large_width, umr_large_density=umr_large_density, tol_val=tol_val)
-	 
+  seg <- MethyLasso:::segment_methylation(data, ret, ncores = t, pmd_max_beta = 1, pmd_std_threshold=0, min_num_cpgs = n, pmd_lambda2=pmd_lambda2, umr_std_threshold=umr_std_threshold ,umr_max_beta=umr_max_beta, lmr_max_beta=lmr_max_beta, valley_max_beta=valley_max_beta, pmd_valley_min_width=pmd_valley_min_width, max_distance=max_distance, min_width=min_width ,umr_large_width=umr_large_width, umr_large_density=umr_large_density, flank.width=flank.width, flank.dist.max=flank.dist.max, flank.num.cpgs=flank.num.cpgs, flank.beta.min=flank.beta.min, split.pmds=split.pmds,merge.pmds=merge.pmds, drop=drop, tol_val=tol_val)	 
   # Save file
   for (i in seq_along(data_list)) {
     name <- nam[i]
