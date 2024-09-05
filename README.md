@@ -81,24 +81,30 @@ OR
 
 ## 6. &emsp;Additional options for advances configurations 
 
-|**argument**|**description**|
-| ---------- | --- |
-|--umrlmr_lambda2 | Segmentation value for UMR/LMR identification (default 25)|
-|--tol_val | Tolerance value for optimization (default 0.01)|
-|--pmd_lambda2 | Segmentation value for PMD identification (default 1000)|
-|--pmd_std_threshold | Standard deviation threshold for PMD (default 0.15)|
-|--umr_std_threshold | Standard deviation threshold for UMR (default 0.1)|
-|--umr_max_beta | Maximum methylation for UMR (default 0.1)|
-|--lmr_max_beta\ | Maximum methylation for LMR (default 0.5)|
-|--valley_max_beta | Maximum methylation for valleys (default 0.1)|
-|--pmd_valley_min_width | Minimum width for PMD valleys (default 5000)|
-|--max_distance | Maximum distance for merging segments (default 500)|
-|--min_width | Minimum width for segments (default 30)|
-|--umr_large_width | Large width threshold for UMRs (default 500)|
-|--umr_large_density | Density threshold for large UMRs (default 0.03)|
-|--dmr_lambda2 | Segmentation value for DMR identification (default 25)|
-|--min.overlap.pc | Minimum overlap percentage for DMRs (default 10)|
-
+| **Argument**              | **Description**                                                                     |
+|---------------------------|-------------------------------------------------------------------------------------|
+| --umrlmr_lambda2          | Segmentation value for UMR/LMR identification (default 25)                          |
+| --tol_val                 | Tolerance value for optimization (default 0.01)                                     |
+| --pmd_lambda2             | Segmentation value for PMD identification (default 1000)                            |
+| --pmd_std_threshold       | Standard deviation threshold for PMD (default 0.15)                                 |
+| --umr_std_threshold       | Standard deviation threshold for UMR (default 0.1)                                  |
+| --umr_max_beta            | Maximum methylation for UMR (default 0.1)                                           |
+| --lmr_max_beta            | Maximum methylation for LMR (default 0.5)                                           |
+| --valley_max_beta         | Maximum methylation for valleys (default 0.1)                                       |
+| --pmd_valley_min_width    | Minimum width for PMD valleys (default 5000)                                        |
+| --max_distance            | Maximum distance for merging segments (default 500)                                 |
+| --min_width               | Minimum width for segments (default 30)                                             |
+| --umr_large_width         | Large width threshold for UMRs (default 500)                                        |
+| --umr_large_density       | Density threshold for large UMRs (default 0.03)                                     |
+| --dmr_lambda2             | Segmentation value for DMR identification (default 25)                              |
+| --min.overlap.pc          | Minimum overlap percentage for DMRs (default 10)                                    |
+| --flank.width             | Minimum width of flanking segments (default 300)                                    |
+| --flank.dist.max          | Maximum distance of UMR/LMR to flanking segment (default 5000)                      |
+| --flank.num.cpgs          | Consider as small UMR/LMRs those which have num.cpgs smaller than this threshold (default 10) |
+| --flank.beta.min          | For small UMR/LMRs, require that flanking segments have mean methylation above this threshold (default 0.5) |
+| --split.pmds              | Whether to split PMDs which contain UMRs (default TRUE)                             |
+| --merge.pmds              | Whether to merge adjacent PMDs into a single region (default TRUE)                  |
+| --drop                    | Whether to drop verbose columns and unannotated segments (default TRUE)             |
 
 
 ## 7. &emsp;Output files and plots  
