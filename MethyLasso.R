@@ -135,10 +135,44 @@ drop = TRUE # Whether to drop verbose columns and unannotated segments
 		}
 	}}
 
+# Convert to numeric or logical 
+mC = as.numeric(mC)
+uC = as.numeric(uC)
+c = as.numeric(c)
+n = as.numeric(n)
+m = as.numeric(m)
+d = as.numeric(d)
+p = as.numeric(p)
+q = as.numeric(q)
+r = as.numeric(r)
+umrlmr_lambda2 = as.numeric(umrlmr_lambda2)
+tol_val = as.numeric(tol_val)
+pmd_lambda2 = as.numeric(pmd_lambda2)
+pmd_std_threshold = as.numeric(pmd_std_threshold)
+umr_std_threshold = as.numeric(umr_std_threshold)
+umr_max_beta = as.numeric(umr_max_beta )
+lmr_max_beta = as.numeric(lmr_max_beta)
+valley_max_beta = as.numeric(valley_max_beta)
+pmd_valley_min_width = as.numeric(pmd_valley_min_width)
+max_distance = as.numeric(max_distance)
+min_width = as.numeric(min_width)
+umr_large_width = as.numeric(umr_large_width)
+umr_large_density = as.numeric(umr_large_density)
+dmr_lambda2 = as.numeric(dmr_lambda2)
+min.overlap.pc = as.numeric(min.overlap.pc)
+flank.width = as.numeric(flank.width)
+flank.dist.max = as.numeric(flank.dist.max)
+flank.num.cpgs = as.numeric(flank.num.cpgs)
+flank.beta.min = as.numeric(flank.beta.min)
 
 s=as.logical(s)
 f=as.logical(f)
 quiet=as.logical(quiet)
+split.pmds =as.logical(split.pmds)
+merge.pmds=as.logical(merge.pmds)
+drop=as.logical(drop)
+
+
 
 
 
@@ -447,7 +481,7 @@ ref = n2
     message("Step 1: Fit of methylation signal\n")
   }
   # FIT
-  ret <- MethyLasso:::signal_detection_fast(data, tol_val=tol_val, ncores = t, verbose = !quiet)
+  ret <- MethyLasso:::signal_detection_fast(data, lambda2 = umrlmr_lambda2, tol_val=tol_val, ncores = t, verbose = !quiet)
 
   # SEGMENT
   if (isFALSE(quiet)) {
