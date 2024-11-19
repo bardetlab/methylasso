@@ -39,9 +39,9 @@ Rscript MethyLasso.R --n1 [name1] --c1 [condition1_replicate1,condition1_replica
 |**argument**|**description**|
 | ---------- | --- |
 | --n1|Name of condition 1 (used in output file names)   |
-| --c1|Input file(s) for condition 1 (separated by comma for replicates) |
+| --c1|Input file(s) for condition 1 (separated by comma without space for replicates) |
 | --n2|Name of condition 2 (used in output file names and corresponding to reference condition for DMR identification) | 
-| --c2|Input file(s) for condition 2 (separated by comma for replicates) |  
+| --c2|Input file(s) for condition 2 (separated by comma without space for replicates) |  
   
 ## 4. &emsp;Input format
 
