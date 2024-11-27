@@ -410,7 +410,7 @@ ref = n2
   differences = MethyLasso:::annotate_differences(diff_call, segments,min.overlap.pc=min.overlap.pc)
 
   write.table(
-    differences[, .(chr = chr, start = start, end = end, num.cpgs1 = num.cpgs, num.cpgs2 = num.cpgs.ref, cov.score = round(coverage.score, 3), meth1 = round(beta * 100, 2), meth2 = round(beta.ref * 100, 2), diff = round(diff * 100, 2), pvalue = round(pval, 4), FDR = round(fdr, 4), annotation = switch)],
+    differences[, .(chr = chr, start = start, end = end, num.cpgs1 = num.cpgs, num.cpgs2 = num.cpgs.ref, cov.score = round(coverage.score, 3), meth1 = round(beta * 100, 2), meth2 = round(beta.ref * 100, 2), diff = round(diff * 100, 2), pvalue = pval, FDR = fdr, annotation = switch)],
     file = paste(o, "/", n1, "_vs_", n2, "_dmrs.tsv", sep = ""),
     quote = FALSE, row.names = FALSE, sep = "\t"
   )
