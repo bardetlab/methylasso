@@ -12,7 +12,7 @@ Publication: https://www.biorxiv.org/content/10.1101/2023.07.27.550791v1
 Dependencies:
 - Requires R 3.6 or greater
 - Requires R packages: Rcpp, RcppEigen, methods,scales, Matrix, matrixStats, data.table, ggplot2, foreach, doParallel, stringr, R.utils
-- Requires anaconda (if you use conda installation)
+- Requires conda (if you do the conda installation)
 
 mkdir MethyLasso  
 unzip methylasso-main.zip  
