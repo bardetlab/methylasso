@@ -85,8 +85,8 @@ help <- function(){
 
 
 ## Default arguments
-mC = 4 # Column number containing count of methylated Cs
-uC = 5 # Column number containing count of unmethylated Cs
+mC = 5 # Column number containing count of methylated Cs
+uC = 6 # Column number containing count of unmethylated Cs
 c = 5 # Minimum coverage per CpG
 n = 4 # Minimum number of CpGs in LMRs, UMRS, DMVs and DMRs
 m = 0.7 # Maximum mean methylation for PMDs
