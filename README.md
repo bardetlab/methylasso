@@ -8,6 +8,9 @@ By Delphine Balaramane, Yannick G Spill, Michaël Weber & Anaïs F Bardet.
 
 Publication: https://www.biorxiv.org/content/10.1101/2023.07.27.550791v1
 
+## Important fix for bismark input files
+MethyLasso version 1.0.0 from December 12th 2024 should be used
+
 ## 1. &emsp;Installation
 Dependencies:
 - Requires R 3.6 or greater
