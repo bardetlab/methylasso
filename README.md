@@ -17,17 +17,17 @@ Dependencies:
 - Requires R packages: Rcpp, RcppEigen, methods,scales, Matrix, matrixStats, data.table, ggplot2, foreach, doParallel, stringr, R.utils
 - Requires conda (if you do the conda installation)
 
-mkdir MethyLasso  
-unzip methylasso-main.zip  
-R CMD INSTALL --preclean methylasso-main  
-
 Conda installation:  
 
 unzip methylasso-main.zip  
 conda env create -f methylasso-main/conda_env.yml  
 conda activate MethyLasso  
 R CMD INSTALL --preclean methylasso-main
-  
+
+Installation without conda:
+unzip methylasso-main.zip  
+R CMD INSTALL --preclean methylasso-main  
+
   
 ## 2. &emsp;Usage
 Using data from two different conditions:  
