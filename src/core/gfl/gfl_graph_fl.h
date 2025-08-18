@@ -7,13 +7,13 @@
 #define GRAPH_FL_H
 
 #ifdef __cplusplus
+#include <omp.h>
 extern "C" {
 #endif
   
 #include <math.h>
 #include "gfl_tf.h"
 #include "gfl_utils.h"
-#include <omp.h>
 
 #define VARYING_PENALTY_DELAY 50
 
