@@ -5,6 +5,8 @@ message("*  **  *   * * *        *      * * * *     * *     *          *   *    
 message("*      *   *            *      *     *      *      *         * * * *         *         *   *     *")
 message("*      *   * * * *      *      *     *     *       * * * *  *       *  * * * *   * * * *   * * * *\n")
 
+options(scipen = 999)
+
 ## Load libraries
 suppressPackageStartupMessages({
   library(MethyLasso)
