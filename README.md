@@ -6,7 +6,7 @@ MethyLasso identifies low-methylated regions (LMRs), unmethylated regions (UMRs)
 
 By Delphine Balaramane, Yannick G Spill, Michaël Weber & Anaïs F Bardet.  
 
-Publication: https://www.biorxiv.org/content/10.1101/2023.07.27.550791v1
+Publication: https://doi.org/10.1093/nar/gkae880
 
 ## Important fix for bismark input files
 MethyLasso version 1.0.0 from December 12th 2024 should be used. For earlier installations, options "--mC 5 --uC 6" should be specified".
