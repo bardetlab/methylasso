@@ -8,9 +8,6 @@ By Delphine Balaramane, Yannick G Spill, Michaël Weber & Anaïs F Bardet.
 
 Publication: Nucleic Acid Research 2024 https://doi.org/10.1093/nar/gkae880
 
-## Important fix for bismark input files
-MethyLasso version 1.0.0 from December 12th 2024 should be used. For earlier installations, options "--mC 5 --uC 6" should be specified".
-
 ## 1. &emsp;Installation
 Dependencies:
 - Requires R 3.6 or greater
