@@ -66,7 +66,7 @@ segment_methylation_singlechr = function(data, ret, pmd_lambda2=1000, pmd_std_th
   ov[,segment_id:=segment_id+cumsum(is.oversize),keyby=c("condition","estimate_id")]
 
   # Shrink boundaries to span of CpGs
-  ov[,c("start","end"):=list(min(pos),max(pos)+2),keyby=c("condition","estimate_id","segment_id")]
+  ov[,c("start","end"):=list(min(pos),max(pos)+1),keyby=c("condition","estimate_id","segment_id")]
   ov[,width:=end-start+1]
 
   # Compute averages on each segment
@@ -165,7 +165,7 @@ segment_methylation_singlechr = function(data, ret, pmd_lambda2=1000, pmd_std_th
   # Gather individual methylation values for PMDs
   split_call <- split_call[start<=end]
   ov = foverlaps(mdata,split_call)
-  ov[,c("start","end"):=list(min(pos),max(pos)+2),by=c("condition","estimate_id","segment_id")]
+  ov[,c("start","end"):=list(min(pos),max(pos)+1),by=c("condition","estimate_id","segment_id")]
   pmd_call = ov[!is.na(segment_id),.(beta=mean(Nmeth/coverage),coverage=sum(coverage),pseudoweight=pseudoweight[1],
                                      num.cpgs=length(unique(pos)),betavals=list(Nmeth/coverage),coverages=list(coverage),fused_std=fused_std[1]),
                 keyby=c("condition","estimate_id","segment_id","start","end")]
@@ -283,7 +283,7 @@ call_differences_singlechr = function(data, ret, min.diff=0.1,min.delta.diff=0.1
   ov[,segment_id:=segment_id+cumsum(is.oversize),keyby=c("condition","estimate_id")]
 
   # Shrink boundaries to span of CpGs
-  ov[,c("start","end"):=list(min(pos),max(pos)+2),keyby=c("condition","estimate_id","segment_id")]
+  ov[,c("start","end"):=list(min(pos),max(pos)+1),keyby=c("condition","estimate_id","segment_id")]
   ov[,width:=end-start+1]
 
   # Compute averages on each segment
